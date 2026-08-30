@@ -1,0 +1,27 @@
+[package]
+name = "money"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+authors = ["WyattAu"]
+description = "Money types for Rust — CurrencyAmount with Decimal precision, multi-currency support, FX conversion, and formatting"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/WyattAu/money"
+keywords = ["money", "currency", "decimal", "finance", "fx"]
+categories = ["finance", "rust-patterns"]
+readme = "README.md"
+
+[dependencies]
+rust_decimal = "1"
+serde = { version = "1", features = ["derive"], optional = true }
+thiserror = "2"
+utoipa = { version = "4", optional = true }
+
+[features]
+default = ["serde_impl"]
+serde_impl = ["dep:serde"]
+openapi = ["dep:utoipa"]
+
+[dev-dependencies]
+serde_json = "1"
+rust_decimal_macros = "1"
