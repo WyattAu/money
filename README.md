@@ -1,4 +1,4 @@
-# money
+# decimal-money
 
 Money types for Rust — `CurrencyAmount` with `Decimal` precision, multi-currency support, FX conversion, and formatting.
 
