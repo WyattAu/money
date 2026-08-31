@@ -104,9 +104,13 @@ impl FxProvider for InMemoryFxProvider {
 }
 
 /// Converts a `CurrencyAmount` using an `FxProvider`.
-pub fn convert(amount: &CurrencyAmount, provider: &impl FxProvider) -> Result<CurrencyAmount> {
-    let rate = provider.get_rate(amount.currency, amount.currency)?;
-    Ok(CurrencyAmount::new(amount.amount * rate.rate, amount.currency))
+pub fn convert(
+    amount: &CurrencyAmount,
+    to: Currency,
+    provider: &impl FxProvider,
+) -> Result<CurrencyAmount> {
+    let rate = provider.get_rate(amount.currency, to)?;
+    Ok(CurrencyAmount::new(amount.amount * rate.rate, to))
 }
 
 #[cfg(test)]
