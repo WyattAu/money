@@ -8,6 +8,7 @@ use crate::error::{MoneyError, Result};
 
 /// A monetary amount with a currency.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[must_use]
 #[cfg_attr(feature = "serde_impl", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct CurrencyAmount {

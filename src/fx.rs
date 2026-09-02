@@ -6,7 +6,8 @@ use crate::currency::Currency;
 use crate::error::{MoneyError, Result};
 
 /// An exchange rate between two currencies.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[must_use]
 #[cfg_attr(feature = "serde_impl", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct FxRate {
@@ -20,8 +21,17 @@ pub struct FxRate {
 
 impl FxRate {
     /// Creates a new `FxRate`.
-    pub fn new(from: Currency, to: Currency, rate: Decimal) -> Self {
-        Self { from, to, rate }
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MoneyError::InvalidAmount`] if `rate` is zero or negative.
+    pub fn new(from: Currency, to: Currency, rate: Decimal) -> Result<Self> {
+        if rate <= Decimal::ZERO {
+            return Err(MoneyError::InvalidAmount(
+                "exchange rate must be positive".into(),
+            ));
+        }
+        Ok(Self { from, to, rate })
     }
 
     /// Creates a rate that represents identity (1:1).
@@ -34,6 +44,10 @@ impl FxRate {
     }
 
     /// Returns the inverse rate.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the rate is zero (should be impossible after `new()` validation).
     pub fn inverse(&self) -> Self {
         Self {
             from: self.to,
@@ -66,8 +80,18 @@ impl InMemoryFxProvider {
     }
 
     /// Adds or updates an exchange rate.
-    pub fn set_rate(&mut self, from: Currency, to: Currency, rate: Decimal) {
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MoneyError::InvalidAmount`] if `rate` is zero or negative.
+    pub fn set_rate(&mut self, from: Currency, to: Currency, rate: Decimal) -> Result<()> {
+        if rate <= Decimal::ZERO {
+            return Err(MoneyError::InvalidAmount(
+                "exchange rate must be positive".into(),
+            ));
+        }
         self.rates.insert((from, to), rate);
+        Ok(())
     }
 
     /// Loads rates from a slice of `FxRate` structs.
@@ -93,16 +117,15 @@ impl FxProvider for InMemoryFxProvider {
             .rates
             .get(&(from, to))
             .ok_or_else(|| MoneyError::InvalidAmount(format!("No rate for {from} -> {to}")))?;
-        Ok(FxRate::new(from, to, *rate))
+        FxRate::new(from, to, *rate)
     }
 
     fn get_rates_from(&self, from: Currency) -> Result<Vec<FxRate>> {
-        Ok(self
-            .rates
+        self.rates
             .iter()
             .filter(|((f, _), _)| *f == from)
             .map(|((f, t), r)| FxRate::new(*f, *t, *r))
-            .collect())
+            .collect()
     }
 }
 
@@ -122,10 +145,20 @@ mod tests {
 
     #[test]
     fn test_fx_rate_inverse() {
-        let rate = FxRate::new(Currency::USD, Currency::EUR, Decimal::try_from("0.85").unwrap());
+        let rate = FxRate::new(Currency::USD, Currency::EUR, Decimal::try_from("0.85").unwrap()).unwrap();
         let inv = rate.inverse();
         assert_eq!(inv.from, Currency::EUR);
         assert_eq!(inv.to, Currency::USD);
+    }
+
+    #[test]
+    fn test_fx_rate_rejects_zero() {
+        assert!(FxRate::new(Currency::USD, Currency::EUR, Decimal::ZERO).is_err());
+    }
+
+    #[test]
+    fn test_fx_rate_rejects_negative() {
+        assert!(FxRate::new(Currency::USD, Currency::EUR, Decimal::try_from("-0.85").unwrap()).is_err());
     }
 
     #[test]
@@ -135,7 +168,8 @@ mod tests {
             Currency::USD,
             Currency::EUR,
             Decimal::try_from("0.85").unwrap(),
-        );
+        )
+        .unwrap();
 
         let rate = provider.get_rate(Currency::USD, Currency::EUR).unwrap();
         assert_eq!(rate.rate, Decimal::try_from("0.85").unwrap());
