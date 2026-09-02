@@ -10,8 +10,11 @@ use crate::error::{MoneyError, Result};
 #[cfg_attr(feature = "serde_impl", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct FxRate {
+    /// Source currency.
     pub from: Currency,
+    /// Target currency.
     pub to: Currency,
+    /// Exchange rate.
     pub rate: Decimal,
 }
 

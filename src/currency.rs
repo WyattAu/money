@@ -7,42 +7,79 @@ use std::fmt;
 #[cfg_attr(feature = "serde_impl", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub enum Currency {
+    /// US Dollar.
     USD,
+    /// Euro.
     EUR,
+    /// British Pound.
     GBP,
+    /// Japanese Yen.
     JPY,
+    /// Swiss Franc.
     CHF,
+    /// Canadian Dollar.
     CAD,
+    /// Australian Dollar.
     AUD,
+    /// Chinese Yuan.
     CNY,
+    /// Indian Rupee.
     INR,
+    /// Brazilian Real.
     BRL,
+    /// South Korean Won.
     KRW,
+    /// Mexican Peso.
     MXN,
+    /// Swedish Krona.
     SEK,
+    /// Norwegian Krone.
     NOK,
+    /// Danish Krone.
     DKK,
+    /// Polish Zloty.
     PLN,
+    /// Czech Koruna.
     CZK,
+    /// Hungarian Forint.
     HUF,
+    /// Russian Ruble.
     RUB,
+    /// South African Rand.
     ZAR,
+    /// Singapore Dollar.
     SGD,
+    /// Hong Kong Dollar.
     HKD,
+    /// New Zealand Dollar.
     NZD,
+    /// Thai Baht.
     THB,
+    /// Turkish Lira.
     TRY,
+    /// UAE Dirham.
     AED,
+    /// Saudi Riyal.
     SAR,
+    /// Nigerian Naira.
     NGN,
+    /// Egyptian Pound.
     EGP,
+    /// Philippine Peso.
     PHP,
+    /// Indonesian Rupiah.
     IDR,
+    /// Malaysian Ringgit.
     MYR,
+    /// Vietnamese Dong.
     VND,
+    /// Pakistani Rupee.
     PKR,
+    /// Bangladeshi Taka.
     BDT,
+    /// Bitcoin.
     BTC,
+    /// Ethereum.
     ETH,
 }
 

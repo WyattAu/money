@@ -11,7 +11,9 @@ use crate::error::{MoneyError, Result};
 #[cfg_attr(feature = "serde_impl", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct CurrencyAmount {
+    /// The monetary amount.
     pub amount: Decimal,
+    /// The currency.
     pub currency: Currency,
 }
 

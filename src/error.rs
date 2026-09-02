@@ -3,7 +3,12 @@
 pub enum MoneyError {
     /// Attempted to operate on amounts with different currencies.
     #[error("Currency mismatch: cannot operate on {left} and {right}")]
-    CurrencyMismatch { left: String, right: String },
+    CurrencyMismatch {
+        /// The left operand's currency code.
+        left: String,
+        /// The right operand's currency code.
+        right: String,
+    },
 
     /// Arithmetic overflow occurred.
     #[error("Overflow during operation")]
