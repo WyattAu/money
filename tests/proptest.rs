@@ -1,8 +1,8 @@
 //! Property-based tests for decimal-money crate.
 
 use proptest::prelude::*;
-use rust_decimal::prelude::*;
 use rust_decimal::Decimal;
+use rust_decimal::prelude::*;
 
 use decimal_money::{Currency, CurrencyAmount};
 

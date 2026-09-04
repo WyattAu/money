@@ -31,4 +31,4 @@ pub use amount::CurrencyAmount;
 pub use currency::Currency;
 pub use error::{MoneyError, Result};
 pub use format::{FormatConfig, SymbolPosition};
-pub use fx::{convert, FxProvider, FxRate, InMemoryFxProvider};
+pub use fx::{FxProvider, FxRate, InMemoryFxProvider, convert};

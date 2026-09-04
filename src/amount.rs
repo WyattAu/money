@@ -1,5 +1,5 @@
-use rust_decimal::prelude::*;
 use rust_decimal::Decimal;
+use rust_decimal::prelude::*;
 use std::ops::{Add, Sub};
 use std::str::FromStr;
 
@@ -33,9 +33,8 @@ impl CurrencyAmount {
     /// * `amount` - A string like `"19.99"`
     /// * `currency` - The currency code like `"USD"`
     pub fn from_str_values(amount: &str, currency: Currency) -> Result<Self> {
-        let decimal = Decimal::from_str(amount).map_err(|e| {
-            MoneyError::InvalidAmount(format!("Invalid decimal '{amount}': {e}"))
-        })?;
+        let decimal = Decimal::from_str(amount)
+            .map_err(|e| MoneyError::InvalidAmount(format!("Invalid decimal '{amount}': {e}")))?;
         Ok(Self::new(decimal, currency))
     }
 

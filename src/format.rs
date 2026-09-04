@@ -101,7 +101,11 @@ impl FormatConfig {
         } else if decimal_part.len() > places {
             decimal_part[..places].to_string()
         } else {
-            format!("{decimal_part}{:0>width$}", "", width = places - decimal_part.len())
+            format!(
+                "{decimal_part}{:0>width$}",
+                "",
+                width = places - decimal_part.len()
+            )
         };
 
         let amount_str = if places > 0 {

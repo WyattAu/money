@@ -1,5 +1,5 @@
-use criterion::{criterion_group, criterion_main, Criterion};
-use money::{CurrencyAmount, Currency, FormatConfig, InMemoryFxProvider};
+use criterion::{Criterion, criterion_group, criterion_main};
+use money::{Currency, CurrencyAmount, FormatConfig, InMemoryFxProvider};
 use rust_decimal_macros::dec;
 
 fn bench_add(c: &mut Criterion) {

@@ -145,7 +145,12 @@ mod tests {
 
     #[test]
     fn test_fx_rate_inverse() {
-        let rate = FxRate::new(Currency::USD, Currency::EUR, Decimal::try_from("0.85").unwrap()).unwrap();
+        let rate = FxRate::new(
+            Currency::USD,
+            Currency::EUR,
+            Decimal::try_from("0.85").unwrap(),
+        )
+        .unwrap();
         let inv = rate.inverse();
         assert_eq!(inv.from, Currency::EUR);
         assert_eq!(inv.to, Currency::USD);
@@ -158,18 +163,26 @@ mod tests {
 
     #[test]
     fn test_fx_rate_rejects_negative() {
-        assert!(FxRate::new(Currency::USD, Currency::EUR, Decimal::try_from("-0.85").unwrap()).is_err());
+        assert!(
+            FxRate::new(
+                Currency::USD,
+                Currency::EUR,
+                Decimal::try_from("-0.85").unwrap()
+            )
+            .is_err()
+        );
     }
 
     #[test]
     fn test_in_memory_provider() {
         let mut provider = InMemoryFxProvider::new();
-        provider.set_rate(
-            Currency::USD,
-            Currency::EUR,
-            Decimal::try_from("0.85").unwrap(),
-        )
-        .unwrap();
+        provider
+            .set_rate(
+                Currency::USD,
+                Currency::EUR,
+                Decimal::try_from("0.85").unwrap(),
+            )
+            .unwrap();
 
         let rate = provider.get_rate(Currency::USD, Currency::EUR).unwrap();
         assert_eq!(rate.rate, Decimal::try_from("0.85").unwrap());
