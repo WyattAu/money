@@ -1,0 +1,27 @@
+[package]
+name = "decimal-money-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[workspace]
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+decimal-money = { path = ".." }
+rust_decimal = "1"
+
+[[bin]]
+name = "fuzz_parse"
+path = "fuzz_targets/fuzz_parse.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_arith"
+path = "fuzz_targets/fuzz_arith.rs"
+test = false
+doc = false
