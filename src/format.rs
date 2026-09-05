@@ -81,9 +81,11 @@ impl FormatConfig {
         let sign = if *value < Decimal::ZERO { "-" } else { "" };
 
         let whole = abs_val.to_string();
-        let parts: Vec<&str> = whole.split('.').collect();
-        let integer_part = parts[0];
-        let decimal_part = if parts.len() > 1 { parts[1] } else { "" };
+        let mut parts = whole.split('.');
+        // `split` always yields at least one item; the fractional part
+        // only exists when the decimal string contains a '.'.
+        let integer_part = parts.next().unwrap_or("");
+        let decimal_part = parts.next().unwrap_or("");
 
         // Add thousands separators
         let mut formatted_int = String::new();
@@ -153,6 +155,15 @@ impl fmt::Display for FormatConfig {
     }
 }
 
+// Tests exercise failure paths and invariants directly; unwrap/expect,
+// slicing, and panicking asserts are acceptable here — violations
+// surface as test failures, not production panics.
+#[allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::indexing_slicing,
+    clippy::panic
+)]
 #[cfg(test)]
 mod tests {
     use super::*;

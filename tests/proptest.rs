@@ -1,8 +1,16 @@
 //! Property-based tests for decimal-money crate.
 
+// Property tests exercise hostile inputs directly; unwrap/expect, slicing,
+// and panicking asserts are the test signal here.
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::indexing_slicing,
+    clippy::panic
+)]
+
 use proptest::prelude::*;
 use rust_decimal::Decimal;
-use rust_decimal::prelude::*;
 
 use decimal_money::{Currency, CurrencyAmount};
 
