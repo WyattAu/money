@@ -7,6 +7,11 @@ all-features = true
 [advisories]
 version = 2
 yanked = "deny"
+ignore = [
+    # proc-macro-error unmaintained — transitive via utoipa 4 (openapi
+    # feature). Not a vulnerability; no safe upgrade until utoipa 5.
+    "RUSTSEC-2024-0370",
+]
 
 [licenses]
 version = 2
