@@ -221,4 +221,40 @@ mod tests {
         let rounded = amount.round();
         assert_eq!(rounded.amount, Decimal::try_from("20.00").unwrap());
     }
+
+    #[test]
+    fn test_round_to_explicit_places() {
+        let amount = CurrencyAmount::new(Decimal::try_from("19.999").unwrap(), Currency::USD);
+        let one_place = amount.round_to(1);
+        assert_eq!(one_place.amount, Decimal::try_from("20.0").unwrap());
+        assert_eq!(one_place.currency, Currency::USD);
+
+        let zero_places = amount.round_to(0);
+        assert_eq!(zero_places.amount, Decimal::from(20));
+    }
+
+    #[test]
+    fn test_to_f64() {
+        let amount = CurrencyAmount::new(Decimal::try_from("19.99").unwrap(), Currency::USD);
+        assert_eq!(amount.to_f64(), Some(19.99));
+    }
+
+    #[test]
+    fn test_parts_splits_major_and_minor() {
+        let amount = CurrencyAmount::new(Decimal::try_from("19.99").unwrap(), Currency::USD);
+        let (major, minor) = amount.parts();
+        assert_eq!(major, Decimal::from(19));
+        assert_eq!(minor, Decimal::try_from("0.99").unwrap());
+
+        // Zero-decimal currency: minor part is always zero.
+        let yen = CurrencyAmount::new(Decimal::from(1234), Currency::JPY);
+        assert_eq!(yen.parts(), (Decimal::from(1234), Decimal::ZERO));
+    }
+
+    #[test]
+    fn test_subtraction_currency_mismatch() {
+        let a = CurrencyAmount::new(Decimal::from(30), Currency::USD);
+        let b = CurrencyAmount::new(Decimal::from(10), Currency::GBP);
+        assert!(matches!(a - b, Err(MoneyError::CurrencyMismatch { .. })));
+    }
 }

@@ -120,6 +120,10 @@ impl FormatConfig {
             SymbolPosition::Prefix => {
                 if symbol_str.is_empty() {
                     format!("{sign}{amount_str}")
+                } else if self.use_iso_code {
+                    // ISO codes read as words, so they take a space before
+                    // the amount: `USD 1,234.56`.
+                    format!("{sign}{symbol_str} {amount_str}")
                 } else {
                     format!("{sign}{symbol_str}{amount_str}")
                 }
@@ -194,5 +198,58 @@ mod tests {
         let config = FormatConfig::us();
         let amount = CurrencyAmount::new(Decimal::from(1234), Currency::JPY);
         assert_eq!(config.format(&amount), "\u{00A5}1,234");
+    }
+
+    #[test]
+    fn test_iso_format_prefixes_iso_code() {
+        let config = FormatConfig::iso();
+        let amount = CurrencyAmount::new(Decimal::try_from("1234.56").unwrap(), Currency::USD);
+        assert_eq!(config.format(&amount), "USD 1,234.56");
+
+        // Sign still renders before the ISO code.
+        let negative = CurrencyAmount::new(Decimal::try_from("-99.5").unwrap(), Currency::USD);
+        assert_eq!(config.format(&negative), "-USD 99.50");
+    }
+
+    #[test]
+    fn test_no_symbol_omits_currency_entirely() {
+        let config = FormatConfig {
+            show_symbol: false,
+            use_iso_code: false,
+            ..FormatConfig::us()
+        };
+        let amount = CurrencyAmount::new(Decimal::try_from("1234.56").unwrap(), Currency::USD);
+        assert_eq!(config.format(&amount), "1,234.56");
+
+        let suffix_config = FormatConfig {
+            symbol_position: SymbolPosition::Suffix,
+            thousands_separator: '.',
+            decimal_separator: ',',
+            show_symbol: false,
+            use_iso_code: false,
+        };
+        assert_eq!(
+            suffix_config.format(&CurrencyAmount::new(
+                Decimal::try_from("1234.56").unwrap(),
+                Currency::EUR
+            )),
+            "1.234,56"
+        );
+    }
+
+    #[test]
+    fn test_extra_fractional_digits_are_truncated_not_rounded() {
+        let config = FormatConfig::us();
+        let amount = CurrencyAmount::new(Decimal::try_from("0.999").unwrap(), Currency::USD);
+        assert_eq!(config.format(&amount), "$0.99");
+    }
+
+    #[test]
+    fn test_format_config_display() {
+        assert_eq!(FormatConfig::us().to_string(), "FormatConfig(prefix, ,, .)");
+        assert_eq!(
+            FormatConfig::european().to_string(),
+            "FormatConfig(suffix, ., ,)"
+        );
     }
 }

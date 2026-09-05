@@ -5,6 +5,12 @@ Changelog](https://keepachangelog.com/) — versions follow [semver](https://sem
 
 ## [Unreleased]
 
+### Fixed
+
+- `FormatConfig::iso()` documented `USD 1,234.56` but rendered `USD1,234.56`
+  with no separator. ISO-code prefixes now include a space before the
+  amount, matching the documented format.
+
 ## [0.2.0] - 2026-09-02
 
 ### Added

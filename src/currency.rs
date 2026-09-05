@@ -286,4 +286,75 @@ mod tests {
         assert_eq!("btc".parse::<Currency>().unwrap(), Currency::BTC);
         assert!("XYZ".parse::<Currency>().is_err());
     }
+
+    /// Every variant: code() matches, FromStr roundtrips (case-insensitively),
+    /// symbol is non-empty, and decimal places match the documented scheme.
+    #[test]
+    fn test_all_currencies_metadata() {
+        const ALL: &[Currency] = &[
+            Currency::USD,
+            Currency::EUR,
+            Currency::GBP,
+            Currency::JPY,
+            Currency::CHF,
+            Currency::CAD,
+            Currency::AUD,
+            Currency::CNY,
+            Currency::INR,
+            Currency::BRL,
+            Currency::KRW,
+            Currency::MXN,
+            Currency::SEK,
+            Currency::NOK,
+            Currency::DKK,
+            Currency::PLN,
+            Currency::CZK,
+            Currency::HUF,
+            Currency::RUB,
+            Currency::ZAR,
+            Currency::SGD,
+            Currency::HKD,
+            Currency::NZD,
+            Currency::THB,
+            Currency::TRY,
+            Currency::AED,
+            Currency::SAR,
+            Currency::NGN,
+            Currency::EGP,
+            Currency::PHP,
+            Currency::IDR,
+            Currency::MYR,
+            Currency::VND,
+            Currency::PKR,
+            Currency::BDT,
+            Currency::BTC,
+            Currency::ETH,
+        ];
+        assert_eq!(ALL.len(), 37);
+
+        for currency in ALL {
+            let code = currency.code();
+            assert!(!code.is_empty());
+            assert!(!currency.symbol().is_empty());
+
+            let expected_places = match currency {
+                Currency::JPY | Currency::KRW => 0,
+                Currency::BTC => 8,
+                Currency::ETH => 18,
+                _ => 2,
+            };
+            assert_eq!(currency.decimal_places(), expected_places, "{code}");
+
+            let parsed: Currency = code.parse().unwrap();
+            assert_eq!(parsed, *currency, "uppercase roundtrip for {code}");
+            let lowered: Currency = code.to_lowercase().parse().unwrap();
+            assert_eq!(lowered, *currency, "lowercase roundtrip for {code}");
+        }
+    }
+
+    #[test]
+    fn test_currency_display_is_iso_code() {
+        assert_eq!(Currency::EUR.to_string(), "EUR");
+        assert_eq!(Currency::ETH.to_string(), "ETH");
+    }
 }

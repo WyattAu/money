@@ -199,4 +199,125 @@ mod tests {
         let identity = provider.get_rate(Currency::USD, Currency::USD).unwrap();
         assert_eq!(identity.rate, Decimal::from(1));
     }
+
+    #[test]
+    fn test_set_rate_rejects_non_positive() {
+        let mut provider = InMemoryFxProvider::new();
+        let zero = provider.set_rate(Currency::USD, Currency::EUR, Decimal::ZERO);
+        assert!(matches!(zero, Err(MoneyError::InvalidAmount(msg)) if msg == "exchange rate must be positive"));
+
+        let negative = provider.set_rate(
+            Currency::USD,
+            Currency::EUR,
+            Decimal::try_from("-1.5").unwrap(),
+        );
+        assert!(negative.is_err());
+        // Rejected rates must not poison the table.
+        assert!(
+            provider
+                .get_rate(Currency::USD, Currency::EUR)
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn test_load_rates_bulk_inserts_and_overwrites() {
+        let mut provider = InMemoryFxProvider::default();
+        provider.load_rates(&[
+            FxRate::new(
+                Currency::USD,
+                Currency::EUR,
+                Decimal::try_from("0.85").unwrap(),
+            )
+            .unwrap(),
+            FxRate::new(
+                Currency::USD,
+                Currency::GBP,
+                Decimal::try_from("0.75").unwrap(),
+            )
+            .unwrap(),
+        ]);
+        // Overwrite the first rate with a new value.
+        provider.load_rates(&[FxRate::new(
+            Currency::USD,
+            Currency::EUR,
+            Decimal::try_from("0.90").unwrap(),
+        )
+        .unwrap()]);
+
+        let eur = provider.get_rate(Currency::USD, Currency::EUR).unwrap();
+        assert_eq!(eur.rate, Decimal::try_from("0.90").unwrap());
+        let gbp = provider.get_rate(Currency::USD, Currency::GBP).unwrap();
+        assert_eq!(gbp.rate, Decimal::try_from("0.75").unwrap());
+    }
+
+    #[test]
+    fn test_get_rate_unknown_pair_is_an_error() {
+        let provider = InMemoryFxProvider::new();
+        let err = provider
+            .get_rate(Currency::USD, Currency::GBP)
+            .unwrap_err();
+        assert!(
+            matches!(err, MoneyError::InvalidAmount(msg) if msg == "No rate for USD -> GBP")
+        );
+    }
+
+    #[test]
+    fn test_get_rates_from_filters_by_source() {
+        let mut provider = InMemoryFxProvider::new();
+        provider.load_rates(&[
+            FxRate::new(
+                Currency::USD,
+                Currency::EUR,
+                Decimal::try_from("0.85").unwrap(),
+            )
+            .unwrap(),
+            FxRate::new(
+                Currency::USD,
+                Currency::GBP,
+                Decimal::try_from("0.75").unwrap(),
+            )
+            .unwrap(),
+            FxRate::new(
+                Currency::EUR,
+                Currency::USD,
+                Decimal::try_from("1.18").unwrap(),
+            )
+            .unwrap(),
+        ]);
+
+        let from_usd = provider.get_rates_from(Currency::USD).unwrap();
+        assert_eq!(from_usd.len(), 2);
+        assert!(from_usd.iter().all(|r| r.from == Currency::USD));
+
+        let from_chf = provider.get_rates_from(Currency::CHF).unwrap();
+        assert!(from_chf.is_empty());
+    }
+
+    #[test]
+    fn test_convert_multiplies_by_rate() {
+        let mut provider = InMemoryFxProvider::new();
+        provider
+            .set_rate(
+                Currency::USD,
+                Currency::EUR,
+                Decimal::try_from("0.85").unwrap(),
+            )
+            .unwrap();
+
+        let hundred_usd = CurrencyAmount::new(Decimal::from(100), Currency::USD);
+        let converted = convert(&hundred_usd, Currency::EUR, &provider).unwrap();
+        assert_eq!(converted.currency, Currency::EUR);
+        assert_eq!(converted.amount, Decimal::from(85));
+
+        // Round-trip through the inverse rate returns to the original amount.
+        let inverse = provider.get_rate(Currency::USD, Currency::EUR).unwrap().inverse();
+        let mut reverse = InMemoryFxProvider::new();
+        reverse
+            .set_rate(Currency::EUR, Currency::USD, inverse.rate)
+            .unwrap();
+        let back = convert(&converted, Currency::USD, &reverse).unwrap();
+        assert_eq!(back.currency, Currency::USD);
+        assert_eq!(back.amount, Decimal::from(100));
+    }
 }
