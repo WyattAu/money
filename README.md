@@ -73,3 +73,7 @@ With `money`, you get:
 ## License
 
 Licensed under either of [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE) at your option.
+
+## Security
+
+Threat model: [THREAT-MODEL.md](THREAT-MODEL.md).
