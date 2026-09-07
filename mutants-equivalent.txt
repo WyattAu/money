@@ -1,0 +1,24 @@
+# Equivalent mutants — money (cargo-mutants --all-features, 2026-09-07)
+#
+# Survivors triaged as EQUIVALENT: no test can kill them because the mutant
+# is behaviorally identical to the original. Baseline: 124 mutants, 14
+# unviable, 107/110 viable killed (97.3%).
+
+src/format.rs:46:9: replace FormatConfig::us -> Self with Default::default()
+  Rationale: `us()` body IS `Self::default()`. Replacing the body with
+  `Default::default()` yields a semantically identical function; no
+  observable difference exists.
+
+src/format.rs:63:13: delete field show_symbol from struct Self expression in FormatConfig::iso
+  Rationale: masked-by-later-guard. `format_decimal` checks
+  `self.use_iso_code` FIRST and derives the prefix from
+  `currency.code()`, never reading `show_symbol` on that path. Since
+  `iso()` always sets `use_iso_code = true`, the deleted field is dead on
+  every reachable `iso()` configuration and both branches produce the same
+  output.
+
+src/format.rs:103:38: replace > with >= in FormatConfig::format_decimal
+  Rationale: boundary produces identical output on both paths. When
+  `decimal_part.len() == places`, the original takes the pad branch with
+  `width = places - len = 0` (no padding) and the mutant truncates to the
+  full length (no truncation) — the resulting string is the same.
