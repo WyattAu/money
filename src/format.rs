@@ -238,6 +238,13 @@ mod tests {
     }
 
     #[test]
+    fn test_zero_amount_has_no_negative_sign() {
+        let config = FormatConfig::us();
+        let zero = CurrencyAmount::new(Decimal::ZERO, Currency::USD);
+        assert_eq!(config.format(&zero), "$0.00");
+    }
+
+    #[test]
     fn test_extra_fractional_digits_are_truncated_not_rounded() {
         let config = FormatConfig::us();
         let amount = CurrencyAmount::new(Decimal::try_from("0.999").unwrap(), Currency::USD);
