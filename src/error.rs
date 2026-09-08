@@ -55,7 +55,10 @@ mod tests {
             "Currency mismatch: cannot operate on USD and EUR"
         );
 
-        assert_eq!(MoneyError::Overflow.to_string(), "Overflow during operation");
+        assert_eq!(
+            MoneyError::Overflow.to_string(),
+            "Overflow during operation"
+        );
         assert_eq!(
             MoneyError::InvalidAmount("negative rate".to_string()).to_string(),
             "Invalid amount: negative rate"

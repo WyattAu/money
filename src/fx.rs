@@ -204,7 +204,9 @@ mod tests {
     fn test_set_rate_rejects_non_positive() {
         let mut provider = InMemoryFxProvider::new();
         let zero = provider.set_rate(Currency::USD, Currency::EUR, Decimal::ZERO);
-        assert!(matches!(zero, Err(MoneyError::InvalidAmount(msg)) if msg == "exchange rate must be positive"));
+        assert!(
+            matches!(zero, Err(MoneyError::InvalidAmount(msg)) if msg == "exchange rate must be positive")
+        );
 
         let negative = provider.set_rate(
             Currency::USD,
@@ -213,11 +215,7 @@ mod tests {
         );
         assert!(negative.is_err());
         // Rejected rates must not poison the table.
-        assert!(
-            provider
-                .get_rate(Currency::USD, Currency::EUR)
-                .is_err()
-        );
+        assert!(provider.get_rate(Currency::USD, Currency::EUR).is_err());
     }
 
     #[test]
@@ -254,12 +252,8 @@ mod tests {
     #[test]
     fn test_get_rate_unknown_pair_is_an_error() {
         let provider = InMemoryFxProvider::new();
-        let err = provider
-            .get_rate(Currency::USD, Currency::GBP)
-            .unwrap_err();
-        assert!(
-            matches!(err, MoneyError::InvalidAmount(msg) if msg == "No rate for USD -> GBP")
-        );
+        let err = provider.get_rate(Currency::USD, Currency::GBP).unwrap_err();
+        assert!(matches!(err, MoneyError::InvalidAmount(msg) if msg == "No rate for USD -> GBP"));
     }
 
     #[test]
@@ -311,7 +305,10 @@ mod tests {
         assert_eq!(converted.amount, Decimal::from(85));
 
         // Round-trip through the inverse rate returns to the original amount.
-        let inverse = provider.get_rate(Currency::USD, Currency::EUR).unwrap().inverse();
+        let inverse = provider
+            .get_rate(Currency::USD, Currency::EUR)
+            .unwrap()
+            .inverse();
         let mut reverse = InMemoryFxProvider::new();
         reverse
             .set_rate(Currency::EUR, Currency::USD, inverse.rate)

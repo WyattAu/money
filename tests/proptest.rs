@@ -143,3 +143,109 @@ proptest! {
         prop_assert_eq!(amt.currency, Currency::USD);
     }
 }
+
+// Allocation properties (largest-remainder) ----------------------------
+
+fn arb_amount() -> impl Strategy<Value = Decimal> {
+    // Mantissa with up to 4 decimal places, both signs.
+    (-1_000_000_000_000i64..=1_000_000_000_000).prop_flat_map(|mantissa| {
+        (0u32..=4).prop_map(move |scale| Decimal::from_i128_with_scale(mantissa as i128, scale))
+    })
+}
+
+fn arb_ratios() -> impl Strategy<Value = Vec<Decimal>> {
+    prop::collection::vec(
+        (0u32..=3, 0i64..=10_000)
+            .prop_map(|(scale, mantissa)| Decimal::from_i128_with_scale(mantissa as i128, scale)),
+        1..=8,
+    )
+    // At least one positive ratio required; filter all-zero vectors.
+    .prop_filter("ratios must not all be zero", |rs| {
+        rs.iter().any(|r| !r.is_zero())
+    })
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(500))]
+
+    #[test]
+    fn allocate_parts_sum_exactly(amount in arb_amount(), ratios in arb_ratios()) {
+        let total = CurrencyAmount::new(amount, Currency::USD);
+        let parts = total.allocate(&ratios).unwrap();
+        prop_assert_eq!(parts.len(), ratios.len());
+        let sum: Decimal = parts.iter().map(|p| p.amount).sum();
+        prop_assert_eq!(sum, total.amount);
+        for part in &parts {
+            prop_assert_eq!(part.currency, Currency::USD);
+        }
+    }
+
+    #[test]
+    fn allocate_single_ratio_is_identity(amount in arb_amount()) {
+        let total = CurrencyAmount::new(amount, Currency::USD);
+        let parts = total.allocate(&[Decimal::ONE]).unwrap();
+        prop_assert_eq!(parts.len(), 1);
+        prop_assert_eq!(parts[0].amount, total.amount);
+    }
+
+    #[test]
+    fn allocate_parts_close_to_exact_share(amount in arb_amount(), ratios in arb_ratios()) {
+        prop_assume!(amount.is_sign_positive() && !amount.is_zero());
+        let total = CurrencyAmount::new(amount, Currency::USD);
+        let parts = total.allocate(&ratios).unwrap();
+        let weight_sum: Decimal = ratios.iter().sum();
+        prop_assume!(!weight_sum.is_zero());
+        for (part, ratio) in parts.iter().zip(ratios.iter()) {
+            let exact = total.amount * ratio / weight_sum;
+            // Within one minor unit of the exact share.
+            let diff = (part.amount - exact).abs();
+            prop_assert!(
+                diff <= Decimal::new(1, total.amount.scale()),
+                "part {} not within one unit of exact share {exact}",
+                part.amount
+            );
+        }
+    }
+
+    #[test]
+    fn allocate_negative_amount_sums_exactly(amount in arb_amount(), ratios in arb_ratios()) {
+        prop_assume!(amount.is_sign_negative() && !amount.is_zero());
+        let total = CurrencyAmount::new(amount, Currency::USD);
+        let parts = total.allocate(&ratios).unwrap();
+        let sum: Decimal = parts.iter().map(|p| p.amount).sum();
+        prop_assert_eq!(sum, total.amount);
+    }
+
+    #[test]
+    fn allocate_zero_sum_ratios_rejected(amount in arb_amount()) {
+        let total = CurrencyAmount::new(amount, Currency::USD);
+        prop_assert!(total.allocate(&[Decimal::ZERO, Decimal::ZERO]).is_err());
+    }
+
+    #[test]
+    fn allocate_negative_ratio_rejected(amount in arb_amount(), neg in -1_000i64..0) {
+        let total = CurrencyAmount::new(amount, Currency::USD);
+        let ratios = [Decimal::from(neg), Decimal::ONE];
+        prop_assert!(total.allocate(&ratios).is_err());
+    }
+
+    #[test]
+    fn allocate_scale_variant_ratios_sum_exactly(
+        mantissa in -10_000_000i64..=10_000_000,
+        r1_scale in 0u32..=4,
+        r1_mantissa in 0i64..=999,
+        r2_scale in 0u32..=4,
+        r2_mantissa in 0i64..=999,
+    ) {
+        prop_assume!(r1_mantissa > 0 || r2_mantissa > 0);
+        let total = CurrencyAmount::new(
+            Decimal::from_i128_with_scale(mantissa as i128, 4),
+            Currency::EUR,
+        );
+        let r1 = Decimal::from_i128_with_scale(r1_mantissa as i128, r1_scale);
+        let r2 = Decimal::from_i128_with_scale(r2_mantissa as i128, r2_scale);
+        let parts = total.allocate(&[r1, r2]).unwrap();
+        let sum: Decimal = parts.iter().map(|p| p.amount).sum();
+        prop_assert_eq!(sum, total.amount);
+    }
+}

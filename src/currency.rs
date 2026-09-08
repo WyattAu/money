@@ -81,6 +81,44 @@ pub enum Currency {
     BTC,
     /// Ethereum.
     ETH,
+    /// Israeli New Shekel.
+    ILS,
+    /// New Taiwan Dollar.
+    TWD,
+    /// Argentine Peso.
+    ARS,
+    /// Chilean Peso.
+    CLP,
+    /// Colombian Peso.
+    COP,
+    /// Peruvian Sol.
+    PEN,
+    /// Bulgarian Lev.
+    BGN,
+    /// Romanian Leu.
+    RON,
+    /// Ukrainian Hryvnia.
+    UAH,
+    /// Icelandic Krona.
+    ISK,
+    /// Moroccan Dirham.
+    MAD,
+    /// Algerian Dinar.
+    DZD,
+    /// Kenyan Shilling.
+    KES,
+    /// Qatari Riyal.
+    QAR,
+    /// Kuwaiti Dinar.
+    KWD,
+    /// Bahraini Dinar.
+    BHD,
+    /// Omani Rial.
+    OMR,
+    /// Jordanian Dinar.
+    JOD,
+    /// Tunisian Dinar.
+    TND,
 }
 
 impl Currency {
@@ -122,6 +160,25 @@ impl Currency {
             Currency::VND => "VND",
             Currency::PKR => "PKR",
             Currency::BDT => "BDT",
+            Currency::ILS => "ILS",
+            Currency::TWD => "TWD",
+            Currency::ARS => "ARS",
+            Currency::CLP => "CLP",
+            Currency::COP => "COP",
+            Currency::PEN => "PEN",
+            Currency::BGN => "BGN",
+            Currency::RON => "RON",
+            Currency::UAH => "UAH",
+            Currency::ISK => "ISK",
+            Currency::MAD => "MAD",
+            Currency::DZD => "DZD",
+            Currency::KES => "KES",
+            Currency::QAR => "QAR",
+            Currency::KWD => "KWD",
+            Currency::BHD => "BHD",
+            Currency::OMR => "OMR",
+            Currency::JOD => "JOD",
+            Currency::TND => "TND",
             Currency::BTC => "BTC",
             Currency::ETH => "ETH",
         }
@@ -165,15 +222,38 @@ impl Currency {
             Currency::VND => "\u{20AB}",
             Currency::PKR => "\u{20A8}",
             Currency::BDT => "\u{09F3}",
+            Currency::ILS => "\u{20AA}",
+            Currency::TWD => "NT$",
+            Currency::ARS => "AR$",
+            Currency::CLP => "CLP",
+            Currency::COP => "COP",
+            Currency::PEN => "S/",
+            Currency::BGN => "\u{043B}\u{0432}",
+            Currency::RON => "lei",
+            Currency::UAH => "\u{20B4}",
+            Currency::ISK => "kr",
+            Currency::MAD => "MAD",
+            Currency::DZD => "DA",
+            Currency::KES => "KSh",
+            Currency::QAR => "QAR",
+            Currency::KWD => "KD",
+            Currency::BHD => "BD",
+            Currency::OMR => "OMR",
+            Currency::JOD => "JD",
+            Currency::TND => "DT",
             Currency::BTC => "\u{20BF}",
             Currency::ETH => "\u{039E}",
         }
     }
 
-    /// Returns the number of decimal places for the currency.
+    /// Returns the number of decimal places for the currency, per ISO 4217
+    /// minor-unit exponents.
     pub fn decimal_places(&self) -> u32 {
         match self {
-            Currency::JPY | Currency::KRW => 0,
+            // Zero-minor-unit currencies.
+            Currency::JPY | Currency::KRW | Currency::VND | Currency::CLP | Currency::ISK => 0,
+            // Three-decimal currencies (dinar/rial conventions).
+            Currency::KWD | Currency::BHD | Currency::OMR | Currency::JOD | Currency::TND => 3,
             Currency::BTC => 8,
             Currency::ETH => 18,
             _ => 2,
@@ -232,6 +312,25 @@ impl std::str::FromStr for Currency {
             "VND" => Ok(Currency::VND),
             "PKR" => Ok(Currency::PKR),
             "BDT" => Ok(Currency::BDT),
+            "ILS" => Ok(Currency::ILS),
+            "TWD" => Ok(Currency::TWD),
+            "ARS" => Ok(Currency::ARS),
+            "CLP" => Ok(Currency::CLP),
+            "COP" => Ok(Currency::COP),
+            "PEN" => Ok(Currency::PEN),
+            "BGN" => Ok(Currency::BGN),
+            "RON" => Ok(Currency::RON),
+            "UAH" => Ok(Currency::UAH),
+            "ISK" => Ok(Currency::ISK),
+            "MAD" => Ok(Currency::MAD),
+            "DZD" => Ok(Currency::DZD),
+            "KES" => Ok(Currency::KES),
+            "QAR" => Ok(Currency::QAR),
+            "KWD" => Ok(Currency::KWD),
+            "BHD" => Ok(Currency::BHD),
+            "OMR" => Ok(Currency::OMR),
+            "JOD" => Ok(Currency::JOD),
+            "TND" => Ok(Currency::TND),
             "BTC" => Ok(Currency::BTC),
             "ETH" => Ok(Currency::ETH),
             _ => Err(crate::error::MoneyError::InvalidAmount(format!(
@@ -329,8 +428,27 @@ mod tests {
             Currency::BDT,
             Currency::BTC,
             Currency::ETH,
+            Currency::ILS,
+            Currency::TWD,
+            Currency::ARS,
+            Currency::CLP,
+            Currency::COP,
+            Currency::PEN,
+            Currency::BGN,
+            Currency::RON,
+            Currency::UAH,
+            Currency::ISK,
+            Currency::MAD,
+            Currency::DZD,
+            Currency::KES,
+            Currency::QAR,
+            Currency::KWD,
+            Currency::BHD,
+            Currency::OMR,
+            Currency::JOD,
+            Currency::TND,
         ];
-        assert_eq!(ALL.len(), 37);
+        assert_eq!(ALL.len(), 56);
 
         for currency in ALL {
             let code = currency.code();
@@ -338,7 +456,8 @@ mod tests {
             assert!(!currency.symbol().is_empty());
 
             let expected_places = match currency {
-                Currency::JPY | Currency::KRW => 0,
+                Currency::JPY | Currency::KRW | Currency::VND | Currency::CLP | Currency::ISK => 0,
+                Currency::KWD | Currency::BHD | Currency::OMR | Currency::JOD | Currency::TND => 3,
                 Currency::BTC => 8,
                 Currency::ETH => 18,
                 _ => 2,
@@ -350,6 +469,93 @@ mod tests {
             let lowered: Currency = code.to_lowercase().parse().unwrap();
             assert_eq!(lowered, *currency, "lowercase roundtrip for {code}");
         }
+    }
+
+    /// Parse -> display roundtrip for every currency: `code().parse()` yields
+    /// the same variant, and `Display` renders the canonical code again.
+    #[test]
+    fn test_all_currencies_parse_display_roundtrip() {
+        const ALL: &[Currency] = &[
+            Currency::USD,
+            Currency::EUR,
+            Currency::GBP,
+            Currency::JPY,
+            Currency::CHF,
+            Currency::CAD,
+            Currency::AUD,
+            Currency::CNY,
+            Currency::INR,
+            Currency::BRL,
+            Currency::KRW,
+            Currency::MXN,
+            Currency::SEK,
+            Currency::NOK,
+            Currency::DKK,
+            Currency::PLN,
+            Currency::CZK,
+            Currency::HUF,
+            Currency::RUB,
+            Currency::ZAR,
+            Currency::SGD,
+            Currency::HKD,
+            Currency::NZD,
+            Currency::THB,
+            Currency::TRY,
+            Currency::AED,
+            Currency::SAR,
+            Currency::NGN,
+            Currency::EGP,
+            Currency::PHP,
+            Currency::IDR,
+            Currency::MYR,
+            Currency::VND,
+            Currency::PKR,
+            Currency::BDT,
+            Currency::ILS,
+            Currency::TWD,
+            Currency::ARS,
+            Currency::CLP,
+            Currency::COP,
+            Currency::PEN,
+            Currency::BGN,
+            Currency::RON,
+            Currency::UAH,
+            Currency::ISK,
+            Currency::MAD,
+            Currency::DZD,
+            Currency::KES,
+            Currency::QAR,
+            Currency::KWD,
+            Currency::BHD,
+            Currency::OMR,
+            Currency::JOD,
+            Currency::TND,
+            Currency::BTC,
+            Currency::ETH,
+        ];
+        for currency in ALL {
+            let displayed = currency.to_string();
+            let parsed: Currency = displayed.parse().unwrap();
+            assert_eq!(
+                parsed, *currency,
+                "parse->display roundtrip for {displayed}"
+            );
+            assert_eq!(parsed.to_string(), displayed);
+        }
+    }
+
+    #[test]
+    fn test_new_currencies_exponents() {
+        assert_eq!(Currency::ILS.decimal_places(), 2);
+        assert_eq!(Currency::CLP.decimal_places(), 0);
+        assert_eq!(Currency::ISK.decimal_places(), 0);
+        assert_eq!(Currency::VND.decimal_places(), 0);
+        assert_eq!(Currency::KWD.decimal_places(), 3);
+        assert_eq!(Currency::BHD.decimal_places(), 3);
+        assert_eq!(Currency::OMR.decimal_places(), 3);
+        assert_eq!(Currency::JOD.decimal_places(), 3);
+        assert_eq!(Currency::TND.decimal_places(), 3);
+        assert_eq!(Currency::TWD.decimal_places(), 2);
     }
 
     #[test]

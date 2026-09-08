@@ -26,9 +26,12 @@ pub mod error;
 pub mod format;
 /// Foreign exchange rate support.
 pub mod fx;
+/// Rounding policies.
+pub mod rounding;
 
 pub use amount::CurrencyAmount;
 pub use currency::Currency;
 pub use error::{MoneyError, Result};
 pub use format::{FormatConfig, SymbolPosition};
 pub use fx::{FxProvider, FxRate, InMemoryFxProvider, convert};
+pub use rounding::RoundingPolicy;
