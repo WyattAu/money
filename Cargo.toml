@@ -16,7 +16,7 @@ readme = "README.md"
 rust_decimal = "1"
 serde = { version = "1", features = ["derive"], optional = true }
 thiserror = "2"
-utoipa = { version = "4", optional = true }
+utoipa = { version = "5", optional = true }
 
 [features]
 default = ["serde_impl"]
