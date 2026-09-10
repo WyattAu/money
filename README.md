@@ -1,6 +1,17 @@
 # decimal-money
 
+[![docs.rs](https://docs.rs/decimal-money/badge.svg)](https://docs.rs/decimal-money)
+[![crates.io](https://img.shields.io/crates/v/decimal-money.svg)](https://crates.io/crates/decimal-money)
+[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
+
 Money types for Rust — `CurrencyAmount` with `Decimal` precision, multi-currency support, FX conversion, and formatting.
+
+## Feature Flags
+
+| Feature | Default | Description |
+|---|---|---|
+| `serde_impl` | ✅ | `Serialize`/`Deserialize` impls for `CurrencyAmount`, `Currency`, FX rates, and rounding policies. |
+| `openapi` | — | `utoipa::ToSchema` derives for OpenAPI schema generation. |
 
 ## Features
 
