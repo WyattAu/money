@@ -1,0 +1,9 @@
+[advisories]
+ignore = [
+    # rkyv 0.7.46 via rust_decimal's optional "rkyv" feature: RUSTSEC-2026-0235
+    # (OOB read in archives containing Rc/Arc). The feature is never enabled by
+    # this crate and the rkyv entry is unreachable in the resolved graph
+    # (`cargo tree -i rkyv` is empty); rust_decimal 1.x pins rkyv to 0.7 so no
+    # compatible fixed version exists. Revisit on rust_decimal 2.x.
+    "RUSTSEC-2026-0235",
+]
