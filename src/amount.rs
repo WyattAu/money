@@ -238,7 +238,7 @@ impl CurrencyAmount {
         // the number of parts.
         let leftover = units - allocated;
         let mut order: Vec<(usize, i128)> = remainders.iter().copied().enumerate().collect();
-        order.sort_by(|a, b| b.1.cmp(&a.1));
+        order.sort_by_key(|&(_, rem)| std::cmp::Reverse(rem));
         let distribute = usize::try_from(leftover.max(0)).map_err(|_| MoneyError::Overflow)?;
         let mut parts = floors;
         for &(idx, _) in order.iter().take(distribute) {

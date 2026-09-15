@@ -6,6 +6,12 @@ All notable changes are documented here.
 All notable changes to this project are documented here. Format: [Keep a
 Changelog](https://keepachangelog.com/) — versions follow [semver](https://semver.org).
 
+## [1.1.1] - 2026-09-12
+
+### Added
+
+- config-knob behavior matrix: tests/config_matrix.rs consolidates the per-knob table — all five FormatConfig fields (symbol_position, thousands_separator, decimal_separator, show_symbol, use_iso_code) change formatted output; all five RoundingPolicy variants produce their documented midpoint results; currency decimal_places changes format width and rounding output.
+
 ## [1.1.0] - 2026-09-09
 
 ### Added
