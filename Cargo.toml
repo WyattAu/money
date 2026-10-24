@@ -1,10 +1,10 @@
 [package]
 name = "decimal-money"
-version = "1.1.1"
+version = "1.1.2"
 edition = "2024"
 rust-version = "1.85"
 authors = ["WyattAu"]
-description = "Money types for Rust — CurrencyAmount with Decimal precision, multi-currency support, FX conversion, and formatting"
+description = "Money types for Rust: CurrencyAmount with Decimal precision, multi-currency support, FX conversion, and formatting"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/WyattAu/money"
 keywords = ["money", "currency", "decimal", "finance", "fx"]
