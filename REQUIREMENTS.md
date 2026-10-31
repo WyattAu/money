@@ -1,4 +1,4 @@
-# Requirements — money
+# Requirements: money
 
 Numbered, testable requirements. Every requirement maps to at least one named
 test; every security-relevant test cites at least one requirement. Doc
@@ -34,10 +34,10 @@ comments on the implementing public item carry `REQ-MNY-NNN` tags.
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| REQ-MNY-100 | No arithmetic or parsing path panics on arbitrary input — bad strings and invalid rates return `Err(MoneyError)` (fuzz target `fuzz_arith` exercises this) | MUST |
+| REQ-MNY-100 | No arithmetic or parsing path panics on arbitrary input; bad strings and invalid rates return `Err(MoneyError)` (fuzz target `fuzz_arith` exercises this) | MUST |
 | REQ-MNY-101 | Monetary values are stored as fixed-point `Decimal`, never binary floats; float conversion is explicit and lossy-flagged (`to_f64`) | MUST |
 | REQ-MNY-102 | `allocate` conserves value exactly: sum of parts equals the input for arbitrary ratio sets (no creation or destruction of value beyond rounding) | MUST |
-| REQ-MNY-103 | Currency mixing is rejected with `CurrencyMismatch` on arithmetic — cross-currency leakage requires an explicit `convert` with a validated positive rate | MUST |
+| REQ-MNY-103 | Currency mixing is rejected with `CurrencyMismatch` on arithmetic; cross-currency leakage requires an explicit `convert` with a validated positive rate | MUST |
 | REQ-MNY-104 | FX rates must be strictly positive and finite; zero/negative rates are rejected at both `FxRate::new` and provider `set_rate` | MUST |
 | REQ-MNY-105 | The crate forbids `unsafe` code; no secret-bearing inputs (e.g. full PAN-style data) are required or logged by any public function | MUST |
 
@@ -45,7 +45,7 @@ comments on the implementing public item carry `REQ-MNY-NNN` tags.
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| REQ-MNY-200 | Property: addition is commutative with zero as identity; subtraction is the inverse — for arbitrary amounts and currencies | MUST |
+| REQ-MNY-200 | Property: addition is commutative with zero as identity; subtraction is the inverse; for arbitrary amounts and currencies | MUST |
 | REQ-MNY-201 | Property: sign predicates, `abs`, and `round` maintain invariants for arbitrary generated amounts (abs non-negative, round preserves currency) | MUST |
 | REQ-MNY-202 | Property: allocation part sums equal the original for arbitrary ratio vectors, including scaled variants and negative amounts | MUST |
 | REQ-MNY-203 | Property: `from_str_values` round-trips and `Currency` from-str round-trips for all valid inputs | MUST |

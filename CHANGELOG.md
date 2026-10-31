@@ -4,19 +4,19 @@ All notable changes are documented here.
 
 
 All notable changes to this project are documented here. Format: [Keep a
-Changelog](https://keepachangelog.com/) — versions follow [semver](https://semver.org).
+Changelog](https://keepachangelog.com/); versions follow [semver](https://semver.org).
 
 ## [1.1.1] - 2026-09-12
 
 ### Added
 
-- config-knob behavior matrix: tests/config_matrix.rs consolidates the per-knob table — all five FormatConfig fields (symbol_position, thousands_separator, decimal_separator, show_symbol, use_iso_code) change formatted output; all five RoundingPolicy variants produce their documented midpoint results; currency decimal_places changes format width and rounding output.
+- config-knob behavior matrix: tests/config_matrix.rs consolidates the per-knob table; all five FormatConfig fields (symbol_position, thousands_separator, decimal_separator, show_symbol, use_iso_code) change formatted output; all five RoundingPolicy variants produce their documented midpoint results; currency decimal_places changes format width and rounding output.
 
 ## [1.1.0] - 2026-09-09
 
 ### Added
 
-- `CurrencyAmount::allocate(&[Decimal])` — splits an amount into parts
+- `CurrencyAmount::allocate(&[Decimal])`; splits an amount into parts
   proportional to the given ratio weights using the largest-remainder
   method, so the parts always sum **exactly** to the original amount (no
   lost cents). Rejects empty, negative, and all-zero ratio sets; works for
@@ -74,7 +74,7 @@ semver guarantees: breaking changes require a major version bump.
 
 ### Added
 
-- `CurrencyAmount` — money type with exact decimal precision
+- `CurrencyAmount`; money type with exact decimal precision
   (`rust_decimal`); arithmetic checks currency compatibility instead of
   panicking.
 - 36+ currencies (fiat and crypto: USD, EUR, GBP, JPY, BTC, ETH, ...).

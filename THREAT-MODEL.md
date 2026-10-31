@@ -1,10 +1,10 @@
-# Threat Model — decimal-money
+# Threat Model: decimal-money
 
 Status: **v1.0** · One-page STRIDE over the public API surface
 (`CurrencyAmount`, `Currency`, `FxRate`, `InMemoryFxProvider`, `FormatConfig`).
 
-Assets: (A1) monetary value integrity — amounts cannot silently overflow,
-round the wrong way, or mix currencies; (A2) FX rate validity — a zero or
+Assets: (A1) monetary value integrity; amounts cannot silently overflow,
+round the wrong way, or mix currencies; (A2) FX rate validity; a zero or
 negative rate silently destroys value; (A3) display correctness.
 
 | # | Threat | Category | Surface | Mitigation | Verifying test |
@@ -17,14 +17,14 @@ negative rate silently destroys value; (A3) display correctness.
 
 **OPEN RISKS**
 
-- **OPEN-1 — `FxRate::inverse` panics on a zero rate** (documented
+- **OPEN-1; `FxRate::inverse` panics on a zero rate** (documented
   `# Panics` section; unreachable via `new` but reachable if a caller
   hand-constructs `FxRate { .. }` literally, since fields are public).
-- **OPEN-2 — rounding mode is caller-invisible.** `round_to` uses
+- **OPEN-2; rounding mode is caller-invisible.** `round_to` uses
   `rust_decimal`'s default (banker's? half-up?) without an explicit mode
-  parameter or test pinning mid-value behavior — financial-grade rounding
+  parameter or test pinning mid-value behavior; financial-grade rounding
   policy is unverified.
-- **OPEN-3 — no amount magnitude cap.** `bounded_decimal` bounds the
+- **OPEN-3; no amount magnitude cap.** `bounded_decimal` bounds the
   *property strategy*, not the API; extreme-but-valid decimals (near
   96-bit bounds) are accepted.
 
@@ -33,5 +33,5 @@ it is given); double-entry/ledger concerns; locale-correct formatting beyond
 `FormatConfig` presets.
 
 **Residual risk:** `to_f64` remains available for display/serialization
-boundaries — value comparisons done on the f64 result are lossy by
+boundaries; value comparisons done on the f64 result are lossy by
 construction.

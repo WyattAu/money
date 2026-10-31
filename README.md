@@ -5,28 +5,28 @@
 [![crates.io](https://img.shields.io/crates/v/decimal-money.svg)](https://crates.io/crates/decimal-money)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
 
-Money types for Rust — `CurrencyAmount` with `Decimal` precision, multi-currency support, FX conversion, and formatting.
+Money types for Rust; `CurrencyAmount` with `Decimal` precision, multi-currency support, FX conversion, and formatting.
 
 ## Feature Flags
 
 | Feature | Default | Description |
 |---|---|---|
 | `serde_impl` | ✅ | `Serialize`/`Deserialize` impls for `CurrencyAmount`, `Currency`, FX rates, and rounding policies. |
-| `openapi` | — | `utoipa::ToSchema` derives for OpenAPI schema generation. |
+| `openapi` |; | `utoipa::ToSchema` derives for OpenAPI schema generation. |
 
 ## Features
 
-- **Decimal precision** — Uses `rust_decimal` for exact arithmetic
-- **56 currencies** — Fiat and crypto (USD, EUR, GBP, JPY, BTC, ETH, ...) with
+- **Decimal precision**; Uses `rust_decimal` for exact arithmetic
+- **56 currencies**; Fiat and crypto (USD, EUR, GBP, JPY, BTC, ETH, ...) with
   ISO 4217 minor-unit exponents (including 0-decimal JPY/KRW and 3-decimal
   KWD/BHD)
-- **Allocation** — `allocate(&[Decimal])` splits amounts proportionally with
+- **Allocation**; `allocate(&[Decimal])` splits amounts proportionally with
   the largest-remainder method; parts sum exactly to the original
-- **Rounding policies** — HalfUp, HalfEven (banker's), HalfDown, Floor,
+- **Rounding policies**; HalfUp, HalfEven (banker's), HalfDown, Floor,
   Ceiling via `round_to_with_policy`
-- **FX conversion** — Pluggable `FxProvider` trait with in-memory implementation
-- **Formatting** — Configurable symbol position, separators, ISO codes
-- **Type-safe** — Currency mismatch errors at runtime, not panics
+- **FX conversion**; Pluggable `FxProvider` trait with in-memory implementation
+- **Formatting**; Configurable symbol position, separators, ISO codes
+- **Type-safe**; Currency mismatch errors at runtime, not panics
 
 ## Quick Start
 
@@ -94,7 +94,7 @@ With `money`, you get:
 use money::{CurrencyAmount, Currency, RoundingPolicy};
 use rust_decimal_macros::dec;
 
-// Split 100.00 three ways — parts sum exactly to the original.
+// Split 100.00 three ways; parts sum exactly to the original.
 let total = money::CurrencyAmount::from_str_values("100.00", Currency::USD).unwrap();
 let parts = total.allocate(&[dec!(1), dec!(1), dec!(1)]).unwrap();
 assert_eq!(parts[0].amount, dec!(33.34));
